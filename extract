@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# script for extracting various archive formats with tar, zip
+# selects tar flags based on the file extension or uses unzip
+
+help()
+{
+    echo "Usage:" ${BASH_SOURCE[0]} "SOURCE [DEST]"
+    echo "Extract SOURCE to ., or extract SOURCE to DEST"
+}
+
+while getopts ":h" arg; do
+    case $arg in
+        h)
+            help
+            exit;;
+    esac
+done
+
+if [[ $# -eq 1 ]]; then
+    SRC=$1
+elif [[ $# -eq 2 ]]; then
+    SRC=$1
+    DST=$2
+else
+    echo "Not enough arguments"
+    exit 1
+fi
+
+# check that SRC file exists
+if [[ ! -f ${SRC} ]]; then
+    echo "File" ${SRC} "does not exist"
+    exit 1
+fi
+
+# select extraction tool
+FILENAME=$(basename -- "${SRC}")
+# is there a better way to do this? what happens if there is a "." in the
+# filename before the extension?
+EXTENSION=$(echo "${FILENAME#*.}" | awk '{print tolower($0)}')
+
+# set the command based on the extension
+# TODO: add checks to see if the required packages for tar to do the extraction
+# are installed
+if [[ "${EXTENSION}" = "tar.gz" ]]; then
+    CMD="tar -xzvf"
+elif [[ "${EXTENSION}" = "tar.bz2" ]]; then
+    CMD="tar -xjvf"
+elif [[ "${EXTENSION}" = "tar.xz" ]]; then
+    CMD="tar -xJvf"
+elif [[ "${EXTENSION}" = "tar.lz" ]]; then
+    CMD="tar -x --lzip -vf"
+elif [[ "${EXTENSION}" = "tar.lzma" ]]; then
+    CMD="tar -x --lzma -vf"
+elif [[ "${EXTENSION}" = "tar" ]]; then
+    CMD="tar -xvf"
+elif [[ "${EXTENSION}" = "zip" ]]; then
+    CMD="unzip"
+else
+    echo ${EXTENSION} "is either not recognised or not supported"
+    exit 1
+fi
+
+# run the command based on number of arguments
+if [[ $# -eq 1 ]]; then
+    eval "${CMD} ${SRC}"
+else
+    # create the destination directory to extract to
+    mkdir -p ${DST}
+
+    # if using unzip then we use -d to specify the destination
+    # otherwise if using tar we use -C
+    if [[ "${CMD}" = "unzip" ]]; then
+        eval "${CMD} ${SRC} -d ${DST}"
+    else
+        eval "${CMD} ${SRC} -C ${DST}"
+    fi
+fi

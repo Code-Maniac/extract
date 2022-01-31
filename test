@@ -1,0 +1,60 @@
+#!/bin/bash
+
+init_test()
+{
+    TMPDIR=./test_dir #$(mktemp)
+    mkdir -p ${TMPDIR}
+    cd ${TMPDIR}
+
+    TESTDATA="Hello World"
+    TESTFILE=./data
+
+    # create a test file and compress into the required formats
+    echo ${TESTDATA} > ${TESTFILE}
+
+    # create a file for each supported format
+    tar -cvf ${TESTFILE}.tar ${TESTFILE} 
+    tar -czvf ${TESTFILE}.tar.gz ${TESTFILE} 
+    tar -cJvf ${TESTFILE}.tar.xz ${TESTFILE} 
+    tar -cjvf ${TESTFILE}.tar.bz2 ${TESTFILE} 
+    tar -c --lzip -vf ${TESTFILE}.tar.lz ${TESTFILE} 
+    tar -c --lzma -vf ${TESTFILE}.tar.lzma ${TESTFILE} 
+    zip ${TESTFILE}.zip ${TESTFILE}
+}
+
+# tar_test()
+# {
+    
+# }
+
+# targz_test()
+# {
+
+# }
+
+# tarxz_test()
+# {
+
+# }
+
+# tarbz2_test()
+# {
+
+# }
+
+# tarlz_test()
+# {
+
+# }
+
+# tarlzma_test()
+# {
+
+# }
+
+# zip_test()
+# {
+
+# }
+
+init_test
