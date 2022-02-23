@@ -9,6 +9,12 @@ Supports:
 * ```tar```
 * ```zip```
 
+## Installation
+Run the install script
+```bash
+sudo ./install
+```
+
 ## Usage
 ```bash
 extract SOURCE [DEST]  
